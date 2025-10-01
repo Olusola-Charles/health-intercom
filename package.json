@@ -1,0 +1,20 @@
+{
+  "name": "healthintercomm-system",
+  "version": "1.0.0",
+  "description": "Health InterComm Healthcare Management System",
+  "main": "server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd backend && npm run dev",
+    "client": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "install-deps": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "seed": "cd backend && npm run seed"
+  },
+  "keywords": ["healthcare", "EMR", "appointment", "medical", "react", "nodejs", "mongodb"],
+  "author": "Healthcare Developer",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

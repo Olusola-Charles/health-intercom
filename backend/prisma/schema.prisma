@@ -1,0 +1,250 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PATIENT
+  DOCTOR
+  NURSE
+  ADMIN
+  PHARMACY
+  LAB
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum BloodGroup {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum AppointmentType {
+  CONSULTATION
+  FOLLOW_UP
+  EMERGENCY
+  PROCEDURE
+  CHECKUP
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  CANCELLED
+  REFUNDED
+}
+
+model User {
+  id                    String    @id @default(cuid())
+  email                 String    @unique
+  password              String
+  firstName             String
+  lastName              String
+  phone                 String
+  role                  UserRole  @default(PATIENT)
+  avatar                String?
+  isActive              Boolean   @default(true)
+  isVerified            Boolean   @default(false)
+  verificationToken     String?
+  resetPasswordToken    String?
+  resetPasswordExpire   DateTime?
+  lastLogin             DateTime?
+  loginAttempts         Int       @default(0)
+  lockUntil             DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  // Patient specific fields
+  dateOfBirth           DateTime?
+  gender                Gender?
+  bloodGroup            BloodGroup?
+  allergies             String[]
+  medicalHistory        String[]
+
+  // Doctor specific fields
+  specialization        String?
+  qualifications        String[]
+  experience            Int?
+  consultationFee       Decimal?
+  bio                   String?
+  rating                Decimal?   @default(0)
+  totalRatings          Int       @default(0)
+  availableDays         String[]
+  availableTimeStart    String?
+  availableTimeEnd      String?
+
+  // Staff specific fields
+  department            String?
+  employeeId            String?   @unique
+  license               String?
+
+  // Relations
+  patientAppointments   Appointment[] @relation("PatientAppointments")
+  doctorAppointments    Appointment[] @relation("DoctorAppointments")
+  createdAppointments   Appointment[] @relation("CreatedAppointments")
+  medicalRecord         MedicalRecord?
+  blogPosts             Blog[]
+
+  @@map("users")
+}
+
+model Appointment {
+  id                  String            @id @default(cuid())
+  appointmentId       String            @unique @default(cuid())
+  appointmentDate     DateTime
+  appointmentTime     String
+  duration            Int               @default(30)
+  type                AppointmentType   @default(CONSULTATION)
+  status              AppointmentStatus @default(SCHEDULED)
+  reason              String
+  symptoms            String[]
+  notes               String?
+  
+  // Payment
+  fee                 Decimal
+  paymentStatus       PaymentStatus     @default(PENDING)
+  paymentMethod       String?
+  paymentId           String?
+
+  // Medical details (stored as JSON for flexibility)
+  vitals              Json?
+  diagnosis           Json?
+  prescription        Json?
+  labOrders           Json?
+  
+  // Follow up
+  followUpRequired    Boolean           @default(false)
+  followUpTimeframe   String?
+  followUpInstructions String?
+
+  // Rating
+  rating              Int?
+  feedback            String?
+  ratedAt             DateTime?
+
+  // Cancellation
+  cancellationReason  String?
+  cancelledAt         DateTime?
+
+  // Check-in/out
+  checkedInAt         DateTime?
+  checkedOutAt        DateTime?
+
+  // Relations
+  patientId           String
+  patient             User              @relation("PatientAppointments", fields: [patientId], references: [id])
+  doctorId            String
+  doctor              User              @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  createdById         String
+  createdBy           User              @relation("CreatedAppointments", fields: [createdById], references: [id])
+
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@map("appointments")
+}
+
+model MedicalRecord {
+  id                String   @id @default(cuid())
+  recordId          String   @unique @default(cuid())
+  patientId         String   @unique
+  patient           User     @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  // Medical data stored as JSON for flexibility
+  currentVitals     Json?
+  vitalHistory      Json[]
+  currentDiagnoses  Json[]
+  diagnosisHistory  Json[]
+  currentMedications Json[]
+  medicationHistory Json[]
+  labResults        Json[]
+  allergies         Json[]
+  familyHistory     Json[]
+  
+  // Social history
+  smokingStatus     String?
+  alcoholStatus     String?
+  exerciseFrequency String?
+  occupation        String?
+  
+  // Insurance
+  insuranceProvider String?
+  policyNumber      String?
+  
+  // Access control
+  authorizedDoctors String[] // Array of doctor IDs
+  
+  isActive          Boolean  @default(true)
+  lastUpdatedById   String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("medical_records")
+}
+
+model Blog {
+  id              String    @id @default(cuid())
+  title           String
+  slug            String    @unique
+  content         String
+  excerpt         String
+  category        String
+  tags            String[]
+  featuredImage   String?
+  status          String    @default("DRAFT")
+  publishedAt     DateTime?
+  readTime        Int       @default(5)
+  views           Int       @default(0)
+  isFeatured      Boolean   @default(false)
+  isCommentEnabled Boolean  @default(true)
+  
+  // Relations
+  authorId        String
+  author          User      @relation(fields: [authorId], references: [id])
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("blogs")
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  action      String   // CREATE, UPDATE, DELETE, VIEW
+  tableName   String
+  recordId    String?
+  oldValues   Json?
+  newValues   Json?
+  ipAddress   String?
+  userAgent   String?
+  userId      String?
+  createdAt   DateTime @default(now())
+
+  @@map("audit_logs")
+}
