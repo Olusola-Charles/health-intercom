@@ -1,6 +1,6 @@
 import express, { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { auth, patientOnly, doctorOnly, medicalStaffOnly, AuthRequest } from '../middleware/auth';
+import { auth, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -64,8 +64,17 @@ router.get('/', auth, async (req: AuthRequest, res: Response): Promise<void> => 
 });
 
 // POST /api/appointments - Book a new appointment (patients only)
-router.post('/', patientOnly, async (req: AuthRequest, res: Response): Promise<void> => {
+router.post('/', auth, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    // Check if user is a patient
+    if (req.currentUser.role !== 'PATIENT') {
+      res.status(403).json({
+        success: false,
+        message: 'Access denied. Patients only.'
+      });
+      return;
+    }
+
     const { doctorId, appointmentDate, appointmentTime, reason, symptoms } = req.body;
     const patientId = req.user!.userId;
 
@@ -173,6 +182,77 @@ router.post('/', patientOnly, async (req: AuthRequest, res: Response): Promise<v
   }
 });
 
+// GET /api/appointments/available-slots/:doctorId - Get available time slots for a doctor
+router.get('/available-slots/:doctorId', async (req: express.Request, res: express.Response): Promise<void> => {
+  try {
+    const { doctorId } = req.params;
+    const { date } = req.query;
+
+    if (!date) {
+      res.status(400).json({
+        success: false,
+        message: 'Date is required'
+      });
+      return;
+    }
+
+    // Verify doctor exists
+    const doctor = await prisma.user.findFirst({
+      where: {
+        id: doctorId,
+        role: 'DOCTOR',
+        isActive: true
+      }
+    });
+
+    if (!doctor) {
+      res.status(404).json({
+        success: false,
+        message: 'Doctor not found'
+      });
+      return;
+    }
+
+    // Get all booked appointments for this doctor on this date
+    const bookedAppointments = await prisma.appointment.findMany({
+      where: {
+        doctorId: doctorId,
+        appointmentDate: new Date(date as string),
+        status: {
+          in: ['SCHEDULED', 'CONFIRMED']
+        }
+      },
+      select: {
+        appointmentTime: true
+      }
+    });
+
+    const bookedSlots = bookedAppointments.map(apt => apt.appointmentTime);
+
+    // Define all possible time slots (customize as needed)
+    const allSlots = [
+      '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+      '12:00', '12:30', '14:00', '14:30', '15:00', '15:30',
+      '16:00', '16:30', '17:00'
+    ];
+
+    // Filter out booked slots
+    const availableSlots = allSlots.filter(slot => !bookedSlots.includes(slot));
+
+    res.json({
+      success: true,
+      data: { availableSlots }
+    });
+
+  } catch (error) {
+    console.error('Get available slots error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
 // GET /api/appointments/:id - Get specific appointment
 router.get('/:id', auth, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -245,8 +325,17 @@ router.get('/:id', auth, async (req: AuthRequest, res: Response): Promise<void> 
 });
 
 // PUT /api/appointments/:id/status - Update appointment status (doctors only)
-router.put('/:id/status', doctorOnly, async (req: AuthRequest, res: Response): Promise<void> => {
+router.put('/:id/status', auth, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    // Check if user is a doctor
+    if (req.currentUser.role !== 'DOCTOR') {
+      res.status(403).json({
+        success: false,
+        message: 'Access denied. Doctors only.'
+      });
+      return;
+    }
+
     const appointmentId = req.params.id;
     const { status, notes } = req.body;
     const doctorId = req.user!.userId;
@@ -398,4 +487,4 @@ router.delete('/:id', auth, async (req: AuthRequest, res: Response): Promise<voi
   }
 });
 
-export default router; 
+export default router;

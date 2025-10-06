@@ -8,6 +8,9 @@ import { PrismaClient } from '@prisma/client';
 import userRoutes from './routes/user';
 import authRoutes from './routes/auth';
 import appointmentRoutes from './routes/appointments';
+import doctorRoutes from './routes/doctors';
+import patientRoutes from './routes/patients';
+
 
 const prisma = new PrismaClient();
 dotenv.config();
@@ -66,6 +69,11 @@ app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 
 app.use('/api/appointments', appointmentRoutes);
+
+app.use('/api/doctors', doctorRoutes);
+
+app.use('/api/patients', patientRoutes);
+
 
 // Basic route for testing
 app.get('/api/test', (req: Request, res: Response) => {

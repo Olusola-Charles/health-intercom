@@ -4,7 +4,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Activity, Calendar, Pill, FileText, MessageSquare, Bell, User
 } from 'lucide-react';
-import useAuth from '../../hooks/useAuth';
+import {useAuth} from '../../hooks/useAuth';
 import Logo from '../common/Logo';
 
 const PatientLayout = () => {

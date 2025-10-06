@@ -69,15 +69,14 @@ export const LoginForm = () => {
                 </h4>
               </div>
               <button
-                onClick={() => handleDemoLogin('admin@hic.com', 'admin123')}
-                className={`text-sm text-left w-full hover:bg-gray-50 p-2 rounded transition-colors ${selectedDemo === 'admin@hic.com' ? 'bg-blue-100' : ''}`}
+                onClick={() => handleDemoLogin('admin@demo.com', 'password123')}
+                className={`text-sm text-left w-full hover:bg-gray-50 p-2 rounded transition-colors ${selectedDemo === 'admin@demo.com' ? 'bg-blue-100' : ''}`}
               >
-                <strong>admin@hic.com</strong> / admin123
+                <strong>admin@demo.com</strong> / password123
                 <br />
                 <span className="text-gray-600 text-xs">System Administrator Dashboard</span>
               </button>
             </div>
-
             {/* Doctor Demo */}
             <div className="bg-white rounded p-3 border border-green-200">
               <div className="flex items-center justify-between mb-1">
@@ -87,12 +86,12 @@ export const LoginForm = () => {
                 </h4>
               </div>
               <button
-                onClick={() => handleDemoLogin('dr.smith@hic.com', 'doctor123')}
-                className={`text-sm text-left w-full hover:bg-gray-50 p-2 rounded transition-colors ${selectedDemo === 'dr.smith@hic.com' ? 'bg-blue-100' : ''}`}
+                onClick={() => handleDemoLogin('doctor@demo.com', 'password123')}
+                className={`text-sm text-left w-full hover:bg-gray-50 p-2 rounded transition-colors ${selectedDemo === 'doctor@demo.com' ? 'bg-blue-100' : ''}`}
               >
-                <strong>dr.smith@hic.com</strong> / doctor123
+                <strong>doctor@demo.com</strong> / password123
                 <br />
-                <span className="text-gray-600 text-xs">Dr. Sarah Smith - Cardiology</span>
+                <span className="text-gray-600 text-xs">Dr. Michael Chen - Cardiology</span>
               </button>
             </div>
 
@@ -105,10 +104,10 @@ export const LoginForm = () => {
                 </h4>
               </div>
               <button
-                onClick={() => handleDemoLogin('john.doe@email.com', 'patient123')}
-                className={`text-sm text-left w-full hover:bg-gray-50 p-2 rounded transition-colors ${selectedDemo === 'john.doe@email.com' ? 'bg-blue-100' : ''}`}
+                onClick={() => handleDemoLogin('patient@demo.com', 'password123')}
+                className={`text-sm text-left w-full hover:bg-gray-50 p-2 rounded transition-colors ${selectedDemo === 'patient@demo.com' ? 'bg-blue-100' : ''}`}
               >
-                <strong>john.doe@email.com</strong> / patient123
+                <strong>patient@demo.com</strong> / password123
                 <br />
                 <span className="text-gray-600 text-xs">John Doe - Patient Portal</span>
               </button>

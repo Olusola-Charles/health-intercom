@@ -23,19 +23,24 @@ import DoctorOverview from '../../pages/doctor/DoctorOverview';
 import DoctorPatients from '../../pages/doctor/DoctorPatients';
 import DoctorSchedule from '../../pages/doctor/DoctorSchedule';
 import DoctorNotes from '../../pages/doctor/DoctorNotes.jsx';
-// import DoctorMessages from '../../pages/doctor/DoctorMessages';
 import Messages from '../../components/shared/Messages'
+import DoctorList from '../../pages/doctor/DoctorList';
+
 
 // Patient pages
 import PatientOverview from '../../pages/patient/PatientOverview';
 import PatientAppointments from '../../pages/patient/PatientAppointments';
 import PatientMedications from '../../pages/patient/PatientMedications';
 import PatientRecords from '../../pages/patient/PatientRecords';
-// import PatientMessages from '../../pages/patient/PatientMessages';
+import BookAppointment from '../../pages/patient/BookAppointment';
 
 // Protected Route component
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -44,11 +49,11 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
     // Redirect to appropriate dashboard based on user role
     switch (user?.role) {
-      case 'admin':
+      case 'ADMIN':
         return <Navigate to="/admin" replace />;
-      case 'doctor':
+      case 'DOCTOR':
         return <Navigate to="/doctor" replace />;
-      case 'patient':
+      case 'PATIENT':
         return <Navigate to="/patient" replace />;
       default:
         return <Navigate to="/login" replace />;
@@ -58,29 +63,12 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   return children;
 };
 
-// Role-based redirect component
-const RoleBasedRedirect = () => {
-  const { user, isAuthenticated } = useAuth();
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  // Redirect to appropriate dashboard based on user role
-  switch (user?.role) {
-    case 'admin':
-      return <Navigate to="/admin" replace />;
-    case 'doctor':
-      return <Navigate to="/doctor" replace />;
-    case 'patient':
-      return <Navigate to="/patient" replace />;
-    default:
-      return <Navigate to="/login" replace />;
-  }
-};
-
 const AppRouter = () => {
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Routes>
@@ -88,7 +76,14 @@ const AppRouter = () => {
       <Route 
         path="/login" 
         element={
-          isAuthenticated ? <RoleBasedRedirect /> : <LoginPage />
+          isAuthenticated ? (
+            user?.role === 'ADMIN' ? <Navigate to="/admin" replace /> :
+            user?.role === 'DOCTOR' ? <Navigate to="/doctor" replace /> :
+            user?.role === 'PATIENT' ? <Navigate to="/patient" replace /> :
+            <Navigate to="/login" replace />
+          ) : (
+            <LoginPage />
+          )
         } 
       />
 
@@ -96,7 +91,7 @@ const AppRouter = () => {
       <Route 
         path="/admin/*" 
         element={
-          <ProtectedRoute allowedRoles={['admin']}>
+          <ProtectedRoute allowedRoles={['ADMIN']}>
             <AdminLayout />
           </ProtectedRoute>
         }
@@ -113,7 +108,7 @@ const AppRouter = () => {
       <Route 
         path="/doctor/*" 
         element={
-          <ProtectedRoute allowedRoles={['doctor']}>
+          <ProtectedRoute allowedRoles={['DOCTOR']}>
             <DoctorLayout />
           </ProtectedRoute>
         }
@@ -130,7 +125,7 @@ const AppRouter = () => {
       <Route 
         path="/patient/*" 
         element={
-          <ProtectedRoute allowedRoles={['patient']}>
+          <ProtectedRoute allowedRoles={['PATIENT']}>
             <PatientLayout />
           </ProtectedRoute>
         }
@@ -140,12 +135,25 @@ const AppRouter = () => {
         <Route path="appointments" element={<PatientAppointments />} />
         <Route path="medications" element={<PatientMedications />} />
         <Route path="records" element={<PatientRecords />} />
-        {/* <Route path="messages" element={<PatientMessages />} /> */}
         <Route path="messages" element={<Messages />} />
+        <Route path="doctors" element={<DoctorList />} />
+        <Route path="book-appointment/:doctorId" element={<BookAppointment />} />
       </Route>
 
       {/* Default redirect */}
-      <Route path="/" element={<RoleBasedRedirect />} />
+      <Route 
+        path="/" 
+        element={
+          isAuthenticated ? (
+            user?.role === 'ADMIN' ? <Navigate to="/admin" replace /> :
+            user?.role === 'DOCTOR' ? <Navigate to="/doctor" replace /> :
+            user?.role === 'PATIENT' ? <Navigate to="/patient" replace /> :
+            <Navigate to="/login" replace />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } 
+      />
       
       {/* 404 page */}
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -91,51 +91,51 @@ async function main() {
     console.log(`  Doctors: ${doctor1.email}, ${doctor2.email}`);
     console.log(`  Admin: ${admin.email}`);
 
-    // Create sample appointments
-    const appointment1 = await prisma.appointment.create({
-      data: {
-        appointmentDate: new Date(Date.now() + 86400000), // Tomorrow
-        appointmentTime: '10:00',
-        status: 'SCHEDULED',
-        reason: 'Regular checkup',
-        fee: 200,
-        patientId: patient1.id,
-        doctorId: doctor1.id,
-        createdById: patient1.id, // Patient created the appointment
-      }
-    });
+    // // Create sample appointments
+    // const appointment1 = await prisma.appointment.create({
+    //   data: {
+    //     appointmentDate: new Date(Date.now() + 86400000), // Tomorrow
+    //     appointmentTime: '10:00',
+    //     status: 'SCHEDULED',
+    //     reason: 'Regular checkup',
+    //     fee: 200,
+    //     patientId: patient1.id,
+    //     doctorId: doctor1.id,
+    //     createdById: patient1.id, // Patient created the appointment
+    //   }
+    // });
 
-    const appointment2 = await prisma.appointment.create({
-      data: {
-        appointmentDate: new Date(Date.now() + 172800000), // Day after tomorrow
-        appointmentTime: '14:30',
-        status: 'CONFIRMED',
-        reason: 'Follow-up consultation',
-        fee: 150,
-        patientId: patient2.id,
-        doctorId: doctor2.id,
-        createdById: patient2.id, // Patient created the appointment
-      }
-    });
+    // const appointment2 = await prisma.appointment.create({
+    //   data: {
+    //     appointmentDate: new Date(Date.now() + 172800000), // Day after tomorrow
+    //     appointmentTime: '14:30',
+    //     status: 'CONFIRMED',
+    //     reason: 'Follow-up consultation',
+    //     fee: 150,
+    //     patientId: patient2.id,
+    //     doctorId: doctor2.id,
+    //     createdById: patient2.id, // Patient created the appointment
+    //   }
+    // });
 
-    const appointment3 = await prisma.appointment.create({
-      data: {
-        appointmentDate: new Date(Date.now() - 86400000), // Yesterday
-        appointmentTime: '09:00',
-        status: 'COMPLETED',
-        reason: 'Blood pressure check',
-        fee: 200,
-        patientId: patient1.id,
-        doctorId: doctor1.id,
-        createdById: patient1.id, // Patient created the appointment
-        notes: 'Blood pressure slightly elevated, recommend lifestyle changes'
-      }
-    });
+    // const appointment3 = await prisma.appointment.create({
+    //   data: {
+    //     appointmentDate: new Date(Date.now() - 86400000), // Yesterday
+    //     appointmentTime: '09:00',
+    //     status: 'COMPLETED',
+    //     reason: 'Blood pressure check',
+    //     fee: 200,
+    //     patientId: patient1.id,
+    //     doctorId: doctor1.id,
+    //     createdById: patient1.id, // Patient created the appointment
+    //     notes: 'Blood pressure slightly elevated, recommend lifestyle changes'
+    //   }
+    // });
 
-    console.log('📅 Created appointments:');
-    console.log(`  Scheduled: ${appointment1.reason}`);
-    console.log(`  Confirmed: ${appointment2.reason}`);
-    console.log(`  Completed: ${appointment3.reason}`);
+    // console.log('📅 Created appointments:');
+    // console.log(`  Scheduled: ${appointment1.reason}`);
+    // console.log(`  Confirmed: ${appointment2.reason}`);
+    // console.log(`  Completed: ${appointment3.reason}`);
 
     console.log('\n✅ Database seeding completed successfully!');
     console.log('\n📊 Summary:');

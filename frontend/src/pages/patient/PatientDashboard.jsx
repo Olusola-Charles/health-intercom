@@ -7,11 +7,13 @@ import {
   CheckCircle, Star, TrendingUp, Shield, Stethoscope
 } from 'lucide-react';
 import Logo from '../../components/common/Logo';
+import { useNavigate } from 'react-router-dom';
 
 const PatientDashboard = ({ user, onLogout }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [showNotifications, setShowNotifications] = useState(false);
 
+  const navigate = useNavigate();
   // Sample patient data - in real app, this would come from API
   const patientInfo = {
     name: user?.name || 'John Doe',
@@ -211,6 +213,7 @@ const PatientDashboard = ({ user, onLogout }) => {
           icon={Calendar} 
           color="bg-blue-500"
           action="View Details"
+          onClick={() => navigate('/patient/doctors')}
         />
         <StatCard 
           title="Active Medications" 
@@ -247,7 +250,12 @@ const PatientDashboard = ({ user, onLogout }) => {
               <Calendar className="w-6 h-6 mr-2 text-blue-600" />
               Upcoming Appointments
             </h3>
-            <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">Schedule New</button>
+            <button 
+              onClick={() => navigate('/patient/doctors')}
+              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+            >
+              Schedule New
+            </button>
           </div>
           <div className="space-y-4">
             {upcomingAppointments.slice(0, 3).map(appointment => (
@@ -328,7 +336,10 @@ const PatientDashboard = ({ user, onLogout }) => {
       <div className="bg-white rounded-xl shadow-sm border p-6">
         <h3 className="text-xl font-bold mb-6">Quick Actions</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button className="flex flex-col items-center space-y-3 p-6 border-2 border-dashed border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all">
+          <button 
+            onClick={() => navigate('/patient/doctors')}
+            className="flex flex-col items-center space-y-3 p-6 border-2 border-dashed border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all"
+          >
             <Calendar className="w-8 h-8 text-blue-600" />
             <span className="font-medium text-blue-600">Book Appointment</span>
           </button>
@@ -358,7 +369,10 @@ const PatientDashboard = ({ user, onLogout }) => {
             <h2 className="text-2xl font-bold text-gray-900">My Appointments</h2>
             <p className="text-gray-600">Manage your upcoming and past appointments</p>
           </div>
-          <button className="flex items-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <button 
+            onClick={() => navigate('/patient/doctors')}
+            className="flex items-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
             <Plus className="w-5 h-5" />
             <span>Schedule Appointment</span>
           </button>

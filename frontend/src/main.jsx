@@ -1,7 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import { AuthProvider } from './components/auth/AuthProvider'  // ✅ CORRECT PATH
+// import { AuthProvider } from './components/auth/AuthProvider'  // ✅ CORRECT PATH
+import { AuthProvider } from './contexts/AuthContext';
 import App from './App.jsx'
 import './index.css'
 

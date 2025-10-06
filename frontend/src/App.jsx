@@ -1,6 +1,6 @@
 // src/App.js
 import React from 'react';
-import { AuthProvider } from './components/auth/AuthProvider';
+import { AuthProvider } from './contexts/AuthContext';
 import AppRouter from './components/routing/AppRouter';
 
 function App() {
